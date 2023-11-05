@@ -13,6 +13,14 @@ public class Universe
 
     public void Evolve()
     {
+        var cellsWithDeadNeighbors = GetProcessableCells();
+        Cells = cellsWithDeadNeighbors
+            .Select(cell => EvolveCell(cell, cellsWithDeadNeighbors)).Where(c => c.IsAlive)
+            .ToList();
+    }
+
+    private List<Cell> GetProcessableCells()
+    {
         var cellsWithDeadNeighbors = new List<Cell>(Cells);
         foreach (var cell in Cells)
         {
@@ -22,20 +30,17 @@ public class Universe
                     cellsWithDeadNeighbors.Add(neighbor);
         }
 
-        var newCells = new List<Cell>();
-        foreach (var cell in cellsWithDeadNeighbors)
-        {
-            var isAlive = false;
-            var aliveNeighbors = CountAliveNeighbors(cell, cellsWithDeadNeighbors);
-            if (aliveNeighbors == 3) isAlive = true;
-            else if (cell.IsAlive && aliveNeighbors == 2) isAlive = true;
+        return cellsWithDeadNeighbors;
+    }
 
-            var newCell = cell with { IsAlive = isAlive };
+    private static Cell EvolveCell(Cell cell, List<Cell> cellsWithDeadNeighbors)
+    {
+        var isAlive = false;
+        var aliveNeighbors = CountAliveNeighbors(cell, cellsWithDeadNeighbors);
+        if (aliveNeighbors == 3) isAlive = true;
+        else if (cell.IsAlive && aliveNeighbors == 2) isAlive = true;
 
-            newCells.Add(newCell);
-        }
-
-        Cells = newCells.Where(c => c.IsAlive).ToList();
+        return cell with { IsAlive = isAlive };
     }
 
     private static int CountAliveNeighbors(Cell cell, List<Cell> cells)
