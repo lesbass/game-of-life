@@ -4,12 +4,12 @@ namespace game_of_life;
 
 public class Universe
 {
-    public Universe(List<Cell> cells)
+    public Universe(IEnumerable<Cell> cells)
     {
-        Cells = cells;
+        Cells = cells.ToList();
     }
 
-    private List<Cell> Cells { get; set; }
+    public List<Cell> Cells { get; private set; }
 
     public void Evolve()
     {
